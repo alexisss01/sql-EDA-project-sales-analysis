@@ -28,7 +28,7 @@ Key characteristics:
 
 * Cleaned and standardised data
 * Star schema design
-* Suitable for BI, ad-hoc SQL, and analytical exploration
+* Suitable for BI and analytical exploration
 
 This ensures the focus of the project remains on **analysis and insight**, rather than data preparation.
 
@@ -39,8 +39,6 @@ This ensures the focus of the project remains on **analysis and insight**, rathe
 The EDA is structured into three logical sections, each implemented as a standalone SQL report.
 
 ### 1. Overall Business Analysis
-
-File: `Overall Analysis.sql`
 
 Key questions explored:
 
@@ -54,8 +52,6 @@ This section provides a high-level view of business performance and establishes 
 
 ### 2. Customer Analysis
 
-File: `Customer Report.sql`
-
 Key questions explored:
 
 * Customer contribution to total sales
@@ -67,8 +63,6 @@ The focus is on understanding **who drives revenue** and identifying meaningful 
 ---
 
 ### 3. Product Analysis
-
-File: `Product Report.sql`
 
 Key questions explored:
 
