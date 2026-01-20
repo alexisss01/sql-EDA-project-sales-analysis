@@ -79,22 +79,6 @@ Product performance pack:
 - ASP/AOR and monthly revenue lens
 - decile scoring + segment labels (Hero/Core/Long Tail/New)
 
-
----
-
-## How to run (SQL Server)
-
-### Prerequisites
-- SQL Server instance with the **Gold layer** created (from the ETL repo)
-- Access to views: `gold.fact_sales`, `gold.dim_customers`, `gold.dim_products`
-
-### Execution order
-You can run scripts independently, but this order is recommended:
-
-1. `Overall Analysis_v2.sql`
-2. `Customer Report_v2.sql`
-3. `Product Report_v2.sql`
-
 ---
 
 ## Outputs
