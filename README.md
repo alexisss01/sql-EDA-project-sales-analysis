@@ -2,7 +2,7 @@
 
 ## Business Context
 
-In many analytics roles, stakeholders require timely insights without the overhead of complex modelling or advanced tooling. SQL-based EDA is often the **first and most critical step** in understanding business performance, validating assumptions, and identifying opportunities or risks.
+In many analytics roles, stakeholders require timely insights without the overhead of complex modelling or advanced tooling. SQL-based EDA is often the first and most critical step in understanding business performance, validating assumptions, and identifying opportunities or risks.
 
 ---
 
