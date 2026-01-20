@@ -1,28 +1,35 @@
 # Exploratory Data Analysis (EDA) – SQL-Based Business Insights
 
-## Project Background
-This project was developed to simulate a real-world business reporting scenario, where raw sales data is transformed into structured insights for decision-making.
-The focus is on using SQL to produce **business-ready metrics** that can be directly consumed by stakeholders or integrated into BI tools.
-
----
-
 ## Business Context
 
 In many analytics roles, stakeholders require timely insights without the overhead of complex modelling or advanced tooling. SQL-based EDA is often the **first and most critical step** in understanding business performance, validating assumptions, and identifying opportunities or risks.
 
-This project simulates a scenario where an analyst is asked to:
+---
 
-* Assess overall sales performance
-* Identify high-value customers and segments
-* Evaluate product-level contribution and trends
+## Where this fits in the end-to-end pipeline
 
-The goal is not predictive modelling, but **clear, explainable insights grounded in data**.
+This project is intentionally split into three parts:
+
+1) **ETL & Data Warehouse (separate repo)**  
+   Builds the **Bronze / Silver / Gold** layers in SQL Server and publishes the Gold star schema.
+2) **EDA / SQL Reporting (this repo)**  
+   Queries the **Gold layer** and produces analyst-ready tables and insights.
+3) **BI Dashboard (separate repo)**  
+   Tableau dashboards built to match the KPI/segment definitions in this repo.
+
+**Important:** The scripts in this repo assume the Gold layer already exists.  
+Run the ETL repo first.
 
 ---
 
 ## Data Source
 
-The analysis is performed on a **business-ready sales data mart** produced by an upstream ETL pipeline (Gold layer).
+All EDA queries run against the Gold layer views/tables:
+
+- `gold.fact_sales` (grain: order line)
+- `gold.dim_customers`
+- `gold.dim_products`
+
 
 Key characteristics:
 
@@ -30,63 +37,87 @@ Key characteristics:
 * Star schema design
 * Suitable for BI and analytical exploration
 
-This ensures the focus of the project remains on **analysis and insight**, rather than data preparation.
+---
+## KPI & segmentation contract
+### Core KPIs
+- **Total Sales** = `SUM(sales_amount)`
+- **Total Quantity** = `SUM(quantity)`
+- **Total Orders** = `COUNT(DISTINCT order_number)`
+- **AOV (Average Order Value)** = `SUM(sales_amount) / COUNT(DISTINCT order_number)`
+- **ASP (Average Selling Price)** = `AVG(sales_amount / NULLIF(quantity,0))` (product-level)
+
+### Recency
+- **Customer Recency (months)** = `DATEDIFF(month, last_order_date, GETDATE())`
+- **Product Recency (months)** = `DATEDIFF(month, last_sale_date, GETDATE())`
+
+### Decile-based segmentation
+To avoid arbitrary thresholds, customer and product segments are based on deciles:
+
+- **Customer Sales Decile** = `NTILE(10) OVER (ORDER BY total_sales DESC)`
+- **Product Revenue Decile** = `NTILE(10) OVER (ORDER BY total_sales DESC)`
+
+Default segment labels:
+- Customers:
+  - **VIP** = top decile (`decile = 1`)
+  - **Regular** = deciles 2–4
+  - **Occasional** = deciles 5–10
+  - **New** = very short activity window (e.g., `active_months <= 2`) — applied as a practical onboarding lens
+- Products:
+  - **Hero** = top decile (`decile = 1`)
+  - **Core** = deciles 2–4
+  - **Long Tail** = deciles 5–10
+  - **New** = `active_months <= 2`
 
 ---
 
-## Analysis Scope
+## Scripts included
 
-The EDA is structured into three logical sections, each implemented as a standalone SQL report.
+### 1) `Overall Analysis_v2.sql`
+Business-wide overview and sanity checks:
+- KPI snapshot
+- Monthly sales trend (EOMONTH)
+- Category/subcategory contribution
+- Customer distribution cuts (country, gender, age bands)
+- Pareto concentration lens (cumulative revenue share by product)
 
-### 1. Overall Business Analysis
 
-Key questions explored:
+### 2) `Customer Report_v2.sql`
+Customer performance pack:
+- customer-level aggregation (orders, sales, quantity, distinct products)
+- recency and activity window
+- decile scoring + segment labels (VIP/Regular/Occasional/New)
+- output ordered by total sales for prioritisation
 
-* Total sales and revenue distribution
-* Order volume and sales trends
-* Average order value and quantity patterns
 
-This section provides a high-level view of business performance and establishes baseline metrics.
+### 3) `Product Report_v2.sql`
+Product performance pack:
+- product-level aggregation (orders, customers, sales, quantity)
+- ASP/AOR and monthly revenue lens
+- decile scoring + segment labels (Hero/Core/Long Tail/New)
 
----
-
-### 2. Customer Analysis
-
-Key questions explored:
-
-* Customer contribution to total sales
-* High-value and repeat customers
-* Customer distribution by geography and attributes
-
-The focus is on understanding **who drives revenue** and identifying meaningful customer segments.
-
----
-
-### 3. Product Analysis
-
-Key questions explored:
-
-* Top-performing products and categories
-* Revenue and quantity contribution by product
-* Product mix and maintenance characteristics
-
-This section supports product and category-level decision-making.
 
 ---
 
-## Analytical Approach
+## How to run (SQL Server)
 
-The analysis relies on:
+### Prerequisites
+- SQL Server instance with the **Gold layer** created (from the ETL repo)
+- Access to views: `gold.fact_sales`, `gold.dim_customers`, `gold.dim_products`
 
-* Aggregations and grouping
-* Window functions where appropriate
-* Business-oriented metrics rather than purely technical outputs
+### Execution order
+You can run scripts independently, but this order is recommended:
 
-Queries are written to be:
+1. `Overall Analysis_v2.sql`
+2. `Customer Report_v2.sql`
+3. `Product Report_v2.sql`
 
-* Readable and maintainable
-* Easy to adapt for BI or dashboarding use cases
-* Suitable for peer review or handover
+---
+
+## Outputs
+Each script returns a set of tables intended for:
+- ad-hoc analysis
+- KPI validation against BI report
+- exporting to CSV for documentation / checks
 
 ---
 
@@ -100,13 +131,6 @@ This project demonstrates the following analyst-relevant capabilities:
 * Structuring analysis for stakeholder consumption
 * Working with analytics-ready data models
 
----
-
-## Key Deliverables
-- Clean, well-structured SQL scripts for reporting purposes
-- Reusable queries designed for business analysis
-- Metrics aligned with common BI and dashboard requirements
-- Outputs suitable for stakeholder-facing reports
 
 
 
