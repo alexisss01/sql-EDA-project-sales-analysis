@@ -6,22 +6,6 @@ In many analytics roles, stakeholders require timely insights without the overhe
 
 ---
 
-## Where this fits in the end-to-end pipeline
-
-This project is intentionally split into three parts:
-
-1) **ETL & Data Warehouse (separate repo)**  
-   Builds the **Bronze / Silver / Gold** layers in SQL Server and publishes the Gold star schema.
-2) **EDA / SQL Reporting (this repo)**  
-   Queries the **Gold layer** and produces analyst-ready tables and insights.
-3) **BI Dashboard (separate repo)**  
-   Tableau dashboards built to match the KPI/segment definitions in this repo.
-
-**Important:** The scripts in this repo assume the Gold layer already exists.  
-Run the ETL repo first.
-
----
-
 ## Data Source
 
 All EDA queries run against the Gold layer views/tables:
